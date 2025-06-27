@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: mohamed7any/mo:backend
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: env-volume
+          mountPath: /app/.env
+          subPath: .env
+      volumes:
+      - name: env-volume
+        configMap:
+          name: backend-env
+      imagePullSecrets:
+      - name: pull-image
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: dev
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP
